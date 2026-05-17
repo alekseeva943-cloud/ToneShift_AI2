@@ -1,10 +1,25 @@
 import OpenAI from 'openai';
+import { buildTransformationPrompt } from './utils/promptBuilder.js';
 
 export const runtime = 'nodejs';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+function getTemperature(tone: string): number {
+  const lowerTone = tone.toLowerCase();
+  if (lowerTone.includes('деловой') || lowerTone.includes('официальный') || lowerTone.includes('строгий')) {
+    return 0.3;
+  }
+  if (lowerTone.includes('креативный') || lowerTone.includes('эмоциональный') || lowerTone.includes('вдохновляющий')) {
+    return 0.9;
+  }
+  if (lowerTone.includes('дружелюбный') || lowerTone.includes('разговорный')) {
+    return 0.7;
+  }
+  return 0.5;
+}
 
 export default async function handler(req: any, res: any) {
   console.log('[API Transform] [STAGE 1] Request entered');
@@ -24,27 +39,21 @@ export default async function handler(req: any, res: any) {
     }
 
     const { text, settings } = body;
-    const prompt = `
-Текст для трансформации: "${text}"
-Параметры: ${JSON.stringify(settings)}
+    const prompt = buildTransformationPrompt(text, settings);
+    const temperature = getTemperature(settings.tone || '');
 
-Верни ответ в формате JSON:
-{
-  "transformedText": "Адаптированная версия текста",
-  "neutralVersion": "Нейтральная версия",
-  "explanation": "Объяснение",
-  "suggestions": ["совет 1", "совет 2"]
-}
-`;
-
-    console.log('[API Transform] [STAGE 3] Requesting OpenAI');
+    console.log(`[API Transform] [STAGE 3] Requesting OpenAI (Temp: ${temperature})`);
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'Вы ИИ-помощник по тексту. Отвечайте строго в формате JSON на русском языке.' },
+        { 
+          role: 'system', 
+          content: 'Вы — ToneCraft AI, продвинутый лингвистический процессор. Ваша специализация — стратегическая адаптация коммуникаций. Вы мыслите глубоко, анализируете контекст и выдаете результат мирового уровня в формате JSON.' 
+        },
         { role: 'user', content: prompt }
       ],
-      response_format: { type: 'json_object' }
+      response_format: { type: 'json_object' },
+      temperature: temperature,
     });
 
     console.log('[API Transform] [STAGE 4] OpenAI response received');
