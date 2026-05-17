@@ -17,17 +17,11 @@ export default function App() {
           <div className="lg:col-span-8 space-y-8">
             <EditorSection />
             
-            <AnimatePresence>
-              {results.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                >
-                  <ResultList />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {results.length > 0 && (
+              <div>
+                <ResultList />
+              </div>
+            )}
           </div>
 
           {/* Sidebar Settings */}

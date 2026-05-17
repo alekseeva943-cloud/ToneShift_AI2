@@ -18,20 +18,27 @@ export function EditorSection() {
     }
 
     try {
+      console.log('[EditorSection] Starting transformation');
       setIsTransforming(true);
       const transformed = await aiService.transformText(inputText, settings);
       
+      console.log('[EditorSection] Transformation received:', transformed);
+      
+      console.log('[EditorSection] Updating state via addResult');
       addResult({
         original: inputText,
         transformed,
         settings,
         timestamp: Date.now(),
       });
+      console.log('[EditorSection] State update requested');
       
       toast.success('Текст успешно трансформирован');
     } catch (error: any) {
+      console.error('[EditorSection] Transformation failed:', error);
       toast.error(error.message || 'Ошибка при трансформации');
     } finally {
+      console.log('[EditorSection] Setting isTransforming to false');
       setIsTransforming(false);
     }
   };
