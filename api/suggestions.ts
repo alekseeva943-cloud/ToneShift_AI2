@@ -1,48 +1,72 @@
-import { getSuggestions } from './services/suggestionService.js';
+import OpenAI from 'openai';
 
 export const runtime = 'nodejs';
 
-export default async function handler(req: any) {
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export default async function handler(req: any, res: any) {
   console.log('[API Suggestions] [STAGE 1] Request entered');
+  
+  if (req.method !== 'POST') {
+    console.warn('[API Suggestions] Method not allowed:', req.method);
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
   try {
-    console.log('[API Suggestions] [STAGE 2] Checking method');
-    if (req.method !== 'POST') {
-      console.warn('[API Suggestions] Method not allowed:', req.method);
-      return Response.json({ success: false, error: 'Method not allowed' }, { status: 405 });
-    }
-
-    console.log('[API Suggestions] [STAGE 3] Parsing body');
-    let body;
-    try {
-      body = req.body || await req.json();
-      console.log('[API Suggestions] Body parsed successfully');
-    } catch (e) {
-      console.warn('[API Suggestions] Failed to parse body via req.json(), trying req.body');
-      body = req.body;
-    }
-
-    if (!body) {
-      console.error('[API Suggestions] CRITICAL: Body is undefined');
-      return Response.json({ success: false, error: 'Request body is missing' }, { status: 400 });
+    console.log('[API Suggestions] [STAGE 2] Checking body');
+    const body = req.body;
+    
+    if (!body || !body.text) {
+      console.error('[API Suggestions] CRITICAL: text is missing from body', JSON.stringify(body));
+      return res.status(400).json({ success: false, error: 'Text is required' });
     }
 
     const { text } = body;
+    const prompt = `
+Проанализируй следующий текст и предложи 3 быстрых варианта его улучшения или изменения тона.
+Текст: "${text}"
 
-    if (!text) {
-      console.warn('[API Suggestions] Missing text in request body');
-      return Response.json({ success: false, error: 'Text is required' }, { status: 400 });
+Верни JSON:
+{
+  "suggestions": [
+    { "label": "Действие", "preview": "Вариант текста" },
+    ...
+  ]
+}
+`;
+
+    console.log('[API Suggestions] [STAGE 3] Requesting OpenAI');
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'Вы ИИ-помощник по тексту. Отвечайте строго в формате JSON на русском языке.' },
+        { role: 'user', content: prompt }
+      ],
+      response_format: { type: 'json_object' }
+    });
+
+    console.log('[API Suggestions] [STAGE 4] OpenAI response received');
+    const content = completion.choices[0].message.content;
+    
+    if (!content) {
+      throw new Error('Empty response from OpenAI');
     }
 
-    console.log('[API Suggestions] [STAGE 4] Calling suggestions service');
-    const suggestions = await getSuggestions(text);
+    const data = JSON.parse(content);
+    console.log('[API Suggestions] [STAGE 5] Returning success response');
     
-    console.log('[API Suggestions] [STAGE 5] Request successful, returning result');
-    return Response.json({ success: true, data: { suggestions } });
+    return res.status(200).json({ 
+      success: true, 
+      data: data 
+    });
+
   } catch (error: any) {
     console.error('[API Suggestions] [FATAL ERROR]:', error);
-    return Response.json({ 
+    return res.status(500).json({ 
       success: false, 
       error: error.message || 'Internal server error' 
-    }, { status: 500 });
+    });
   }
 }

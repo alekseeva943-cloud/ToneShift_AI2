@@ -1,49 +1,72 @@
-import { transformText } from './services/transformationService.js';
+import OpenAI from 'openai';
 
 export const runtime = 'nodejs';
 
-export default async function handler(req: any) {
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export default async function handler(req: any, res: any) {
   console.log('[API Transform] [STAGE 1] Request entered');
+  
+  if (req.method !== 'POST') {
+    console.warn('[API Transform] Method not allowed:', req.method);
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
   try {
-    console.log('[API Transform] [STAGE 2] Checking method');
-    if (req.method !== 'POST') {
-      console.warn('[API Transform] Method not allowed:', req.method);
-      return Response.json({ success: false, error: 'Method not allowed' }, { status: 405 });
-    }
-
-    console.log('[API Transform] [STAGE 3] Parsing body');
-    let body;
-    try {
-      // In some Vercel environments req.body is pre-parsed, in others we need await req.json()
-      body = req.body || await req.json();
-      console.log('[API Transform] Body parsed successfully');
-    } catch (e) {
-      console.warn('[API Transform] Failed to parse body via req.json(), trying req.body');
-      body = req.body;
-    }
-
-    if (!body) {
-      console.error('[API Transform] CRITICAL: Body is undefined');
-      return Response.json({ success: false, error: 'Request body is missing' }, { status: 400 });
+    console.log('[API Transform] [STAGE 2] Checking body');
+    const body = req.body;
+    
+    if (!body || !body.text) {
+      console.error('[API Transform] CRITICAL: text is missing from body', JSON.stringify(body));
+      return res.status(400).json({ success: false, error: 'Text is required' });
     }
 
     const { text, settings } = body;
+    const prompt = `
+Текст для трансформации: "${text}"
+Параметры: ${JSON.stringify(settings)}
 
-    if (!text) {
-      console.warn('[API Transform] Missing text in request body');
-      return Response.json({ success: false, error: 'Text is required' }, { status: 400 });
+Верни ответ в формате JSON:
+{
+  "transformedText": "Адаптированная версия текста",
+  "neutralVersion": "Нейтральная версия",
+  "explanation": "Объяснение",
+  "suggestions": ["совет 1", "совет 2"]
+}
+`;
+
+    console.log('[API Transform] [STAGE 3] Requesting OpenAI');
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'Вы ИИ-помощник по тексту. Отвечайте строго в формате JSON на русском языке.' },
+        { role: 'user', content: prompt }
+      ],
+      response_format: { type: 'json_object' }
+    });
+
+    console.log('[API Transform] [STAGE 4] OpenAI response received');
+    const content = completion.choices[0].message.content;
+    
+    if (!content) {
+      throw new Error('Empty response from OpenAI');
     }
 
-    console.log('[API Transform] [STAGE 4] Calling transformation service');
-    const result = await transformText(text, settings);
+    const data = JSON.parse(content);
+    console.log('[API Transform] [STAGE 5] Returning success response');
     
-    console.log('[API Transform] [STAGE 5] Request successful, returning result');
-    return Response.json({ success: true, data: result });
+    return res.status(200).json({ 
+      success: true, 
+      data: data 
+    });
+
   } catch (error: any) {
     console.error('[API Transform] [FATAL ERROR]:', error);
-    return Response.json({ 
+    return res.status(500).json({ 
       success: false, 
       error: error.message || 'Internal server error' 
-    }, { status: 500 });
+    });
   }
 }
