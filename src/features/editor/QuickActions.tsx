@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
 export function QuickActions() {
-  const { inputText, setSettings, setInputText } = useStore();
+  const { inputText, setSettings, setInputText, addLog } = useStore();
   const [suggestions, setSuggestions] = useState<Array<{ label: string; preview: string }>>([]);
   const [loading, setLoading] = useState(false);
 
@@ -15,13 +15,17 @@ export function QuickActions() {
     const timer = setTimeout(async () => {
       if (inputText.length > 20) {
         setLoading(true);
+        addLog('[QUICK] Text long enough, fetching suggestions');
         try {
           const data = await aiService.getSuggestions(inputText);
+          addLog(`[QUICK] Fetched ${data.suggestions.length} suggestions`);
           setSuggestions(data.suggestions);
-        } catch (err) {
+        } catch (err: any) {
+          addLog(`[QUICK ERROR] ${err.message}`);
           console.error(err);
         } finally {
           setLoading(false);
+          addLog('[QUICK] Suggested fetching completed');
         }
       } else {
         setSuggestions([]);
@@ -58,6 +62,7 @@ export function QuickActions() {
                 size="sm"
                 className="rounded-full text-[11px] h-7 bg-white/50 border-neutral-200 hover:bg-white hover:border-indigo-200 hover:text-indigo-600 transition-all"
                 onClick={() => {
+                  addLog(`[QUICK] Suggestion clicked: ${s.label}`);
                   setInputText(s.preview);
                   toast.success('Предложение применено');
                 }}

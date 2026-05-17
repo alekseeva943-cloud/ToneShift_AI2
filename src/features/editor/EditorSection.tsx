@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { QuickActions } from './QuickActions';
 
 export function EditorSection() {
-  const { inputText, setInputText, settings, setIsTransforming, isTransforming, addResult } = useStore();
+  const { inputText, setInputText, settings, setIsTransforming, isTransforming, addResult, addLog } = useStore();
 
   const handleTransform = async () => {
     if (!inputText.trim()) {
@@ -18,12 +18,17 @@ export function EditorSection() {
     }
 
     try {
+      addLog('[UI] Transformation button clicked');
       console.log('[EditorSection] Starting transformation');
       setIsTransforming(true);
+      
+      addLog('[UI] Calling aiService.transformText');
       const transformed = await aiService.transformText(inputText, settings);
       
+      addLog('[UI] aiService.transformText returned success');
       console.log('[EditorSection] Transformation received:', transformed);
       
+      addLog('[UI] Calling addResult to update state');
       console.log('[EditorSection] Updating state via addResult');
       addResult({
         original: inputText,
@@ -31,13 +36,16 @@ export function EditorSection() {
         settings,
         timestamp: Date.now(),
       });
+      addLog('[UI] State update (addResult) completed');
       console.log('[EditorSection] State update requested');
       
       toast.success('Текст успешно трансформирован');
     } catch (error: any) {
+      addLog(`[UI ERROR] Transformation failed: ${error.message}`);
       console.error('[EditorSection] Transformation failed:', error);
       toast.error(error.message || 'Ошибка при трансформации');
     } finally {
+      addLog('[UI] transformation flow ended');
       console.log('[EditorSection] Setting isTransforming to false');
       setIsTransforming(false);
     }

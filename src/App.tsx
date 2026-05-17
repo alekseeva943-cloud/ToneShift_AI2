@@ -4,7 +4,7 @@ import { SettingsSection } from './features/editor/SettingsSection';
 import { ResultList } from './features/results/ResultList';
 import { Toaster } from './components/ui/sonner';
 import { useStore } from './store/useStore';
-import { motion, AnimatePresence } from 'framer-motion';
+import { DebugPanel } from './components/DebugPanel';
 
 export default function App() {
   const results = useStore((state) => state.results);
@@ -33,6 +33,7 @@ export default function App() {
         </div>
       </div>
       <Toaster position="bottom-right" />
+      <DebugPanel />
     </AppShell>
   );
 }
