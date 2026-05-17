@@ -1,7 +1,7 @@
-import { getOpenAI, SYSTEM_PROMPT } from '../utils/openai';
-import { buildTransformationPrompt } from '../utils/promptBuilder';
-import { parseAIResponse } from '../utils/parser';
-import { TransformationSettings, AIResponse } from '../../src/types';
+import { getOpenAI, SYSTEM_PROMPT } from '../utils/openai.js';
+import { buildTransformationPrompt } from '../utils/promptBuilder.js';
+import { parseAIResponse } from '../utils/parser.js';
+import { TransformationSettings, AIResponse } from '../../src/types.js';
 
 export async function transformText(text: string, settings: TransformationSettings): Promise<AIResponse> {
   const openai = getOpenAI();

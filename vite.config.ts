@@ -44,7 +44,16 @@ export default defineConfig(({ mode }) => {
                     res.end(JSON.stringify(data));
                   };
 
-                  await handler(req, res);
+                  const result = await handler(req, res);
+                  if (result instanceof Response) {
+                    res.statusCode = result.status;
+                    result.headers.forEach((value, key) => {
+                      res.setHeader(key, value);
+                    });
+                    const body = await result.text();
+                    res.end(body);
+                    return;
+                  }
                   return;
                 } catch (error) {
                   console.error('API Error:', error);

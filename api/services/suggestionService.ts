@@ -1,4 +1,4 @@
-import { getOpenAI } from '../utils/openai';
+import { getOpenAI } from '../utils/openai.js';
 
 export interface Suggestion {
   label: string;
