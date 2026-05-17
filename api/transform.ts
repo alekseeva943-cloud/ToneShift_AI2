@@ -1,4 +1,4 @@
-import { getOpenAI, SYSTEM_PROMPT } from './utils/openai';
+import { transformText } from './services/transformationService';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -12,40 +12,10 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const openai = getOpenAI();
-    
-    const userPrompt = `
-Текст для трансформации: "${text}"
-
-Параметры:
-- Цель: ${settings.goal}
-- Аудитория: ${settings.audience}
-- Тон: ${settings.tone}
-- Уровень формальности: ${settings.formality}/100
-- Длина: ${settings.length}
-- Терминология: ${settings.terminology}
-- Интенсивность эмоций: ${settings.intensity}/100
-
-Пожалуйста, выполните трансформацию.
-`;
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt }
-      ],
-      response_format: { type: 'json_object' }
-    });
-
-    const content = response.choices[0].message.content;
-    if (!content) {
-      throw new Error('Empty response from AI');
-    }
-
-    return res.status(200).json(JSON.parse(content));
+    const result = await transformText(text, settings);
+    return res.status(200).json(result);
   } catch (error: any) {
-    console.error('AI Transformation Error:', error);
+    console.error('API Error:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }

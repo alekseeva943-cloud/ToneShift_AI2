@@ -1,4 +1,4 @@
-import { getOpenAI } from './utils/openai';
+import { getSuggestions } from './services/suggestionService';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -12,39 +12,10 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const openai = getOpenAI();
-    
-    const prompt = `
-Проанализируй следующий текст и предложи 3 быстрых варианта его улучшения или изменения тона.
-Текст: "${text}"
-
-Верни JSON:
-{
-  "suggestions": [
-     { "label": "Сделать дружелюбнее", "preview": "..." },
-     { "label": "Сделать лаконичнее", "preview": "..." },
-     { "label": "Добавить экспертности", "preview": "..." }
-  ]
-}
-`;
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: 'Вы ИИ-помощник по тексту. Отвечайте строго в формате JSON на русском языке.' },
-        { role: 'user', content: prompt }
-      ],
-      response_format: { type: 'json_object' }
-    });
-
-    const content = response.choices[0].message.content;
-    if (!content) {
-      throw new Error('Empty response from AI');
-    }
-
-    return res.status(200).json(JSON.parse(content));
+    const suggestions = await getSuggestions(text);
+    return res.status(200).json({ suggestions });
   } catch (error: any) {
-    console.error('AI Suggestions Error:', error);
+    console.error('API Error:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
