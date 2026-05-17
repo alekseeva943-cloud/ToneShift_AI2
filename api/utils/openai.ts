@@ -1,19 +1,12 @@
 import OpenAI from 'openai';
 
-let openai: OpenAI | null = null;
-
-export function getOpenAI() {
-  if (!openai) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY is not defined');
-    }
-    openai = new OpenAI({
-      apiKey,
-    });
-  }
-  return openai;
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error('OPENAI_API_KEY is not defined');
 }
+
+export const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export const SYSTEM_PROMPT = `
 Вы — ведущий архитектор коммуникаций и ИИ-инженер по работе с тоном текста (ToneCraft AI).

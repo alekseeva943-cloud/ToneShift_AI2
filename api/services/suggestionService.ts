@@ -1,4 +1,4 @@
-import { getOpenAI } from '../utils/openai.js';
+import { openai } from '../utils/openai.js';
 
 export interface Suggestion {
   label: string;
@@ -6,8 +6,6 @@ export interface Suggestion {
 }
 
 export async function getSuggestions(text: string): Promise<Suggestion[]> {
-  const openai = getOpenAI();
-  
   const prompt = `
 Проанализируй следующий текст и предложи 3 быстрых варианта его улучшения или изменения тона.
 Текст: "${text}"

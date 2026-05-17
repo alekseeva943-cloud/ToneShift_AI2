@@ -1,4 +1,4 @@
-import { AIResponse } from '../../src/types.js';
+import { AIResponse } from '../../src/types/index.js';
 
 export function parseAIResponse(content: string): AIResponse {
   try {

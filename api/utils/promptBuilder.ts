@@ -1,4 +1,4 @@
-import { TransformationSettings } from '../../src/types.js';
+import { TransformationSettings } from '../../src/types/index.js';
 
 export function buildTransformationPrompt(text: string, settings: TransformationSettings): string {
   return `
