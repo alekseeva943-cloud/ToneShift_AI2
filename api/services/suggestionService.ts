@@ -1,4 +1,5 @@
 import { openai } from '../utils/openai.js';
+import { withTimeout } from '../utils/timeout.js';
 
 export interface Suggestion {
   label: string;
@@ -6,6 +7,7 @@ export interface Suggestion {
 }
 
 export async function getSuggestions(text: string): Promise<Suggestion[]> {
+  console.log('[SuggestionService] Starting suggestions generation');
   const prompt = `
 Проанализируй следующий текст и предложи 3 быстрых варианта его улучшения или изменения тона.
 Текст: "${text}"
@@ -20,7 +22,8 @@ export async function getSuggestions(text: string): Promise<Suggestion[]> {
 }
 `;
 
-  const response = await openai.chat.completions.create({
+  console.log('[SuggestionService] Requesting OpenAI');
+  const responsePromise = openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
       { role: 'system', content: 'Вы ИИ-помощник по тексту. Отвечайте строго в формате JSON на русском языке.' },
@@ -28,6 +31,9 @@ export async function getSuggestions(text: string): Promise<Suggestion[]> {
     ],
     response_format: { type: 'json_object' }
   });
+
+  const response = await withTimeout(responsePromise, 15000, 'OpenAI suggestions request');
+  console.log('[SuggestionService] OpenAI response received');
 
   const content = response.choices[0].message.content;
   if (!content) {
