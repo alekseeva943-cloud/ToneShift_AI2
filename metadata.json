@@ -1,0 +1,8 @@
+{
+  "name": "ToneCraft AI",
+  "description": "Интеллектуальная платформа для трансформации тона, стиля и эмоциональной окраски текста с сохранением семантического смысла.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
