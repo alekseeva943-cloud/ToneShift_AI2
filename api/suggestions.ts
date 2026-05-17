@@ -20,7 +20,7 @@ export default async function handler(req: any, res: any) {
     console.log('[API Suggestions] Calling suggestions service');
     const suggestions = await getSuggestions(text);
     console.log('[API Suggestions] Request successful, returning result');
-    return Response.json({ suggestions });
+    return Response.json({ success: true, data: { suggestions } });
   } catch (error: any) {
     console.error('[API Suggestions] Error:', error);
     return Response.json({ 

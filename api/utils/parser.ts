@@ -4,8 +4,8 @@ export function parseAIResponse(content: string): AIResponse {
   try {
     const parsed = JSON.parse(content);
     return {
-      adapted: parsed.adapted || '',
-      neutral: parsed.neutral || '',
+      transformedText: parsed.transformedText || parsed.adapted || '',
+      neutralVersion: parsed.neutralVersion || parsed.neutral || '',
       explanation: parsed.explanation || '',
       suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
     };

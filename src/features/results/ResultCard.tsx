@@ -64,7 +64,7 @@ export function ResultCard({ result }: { result: TransformationResult }) {
               variant="outline" 
               size="sm" 
               className="h-8 gap-2"
-              onClick={() => handleCopy(activeTab === 'adapted' ? result.transformed.adapted : result.transformed.neutral)}
+              onClick={() => handleCopy(activeTab === 'adapted' ? result.transformed.transformedText : result.transformed.neutralVersion)}
             >
               {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
               {copied ? 'Готово' : 'Копировать'}
@@ -73,13 +73,13 @@ export function ResultCard({ result }: { result: TransformationResult }) {
 
           <TabsContent value="adapted" className="mt-0 focus-visible:ring-0">
             <div className="text-lg leading-relaxed text-neutral-800 font-medium">
-              {result.transformed.adapted}
+              {result.transformed.transformedText}
             </div>
           </TabsContent>
 
           <TabsContent value="neutral" className="mt-0 focus-visible:ring-0">
             <div className="text-lg leading-relaxed text-neutral-500 italic">
-              {result.transformed.neutral}
+              {result.transformed.neutralVersion}
             </div>
           </TabsContent>
 
@@ -94,7 +94,7 @@ export function ResultCard({ result }: { result: TransformationResult }) {
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Трансформация</label>
                   <div className="p-4 bg-indigo-50/50 rounded-xl text-sm border border-indigo-100 text-indigo-900">
-                    {result.transformed.adapted}
+                    {result.transformed.transformedText}
                   </div>
                 </div>
              </div>

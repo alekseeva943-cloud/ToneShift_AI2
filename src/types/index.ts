@@ -13,8 +13,8 @@ export interface TransformationSettings {
 }
 
 export interface AIResponse {
-  adapted: string;
-  neutral: string;
+  transformedText: string;
+  neutralVersion: string;
   explanation: string;
   suggestions: string[];
 }

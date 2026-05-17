@@ -20,7 +20,7 @@ export default async function handler(req: any, res: any) {
     console.log('[API Transform] Calling transformation service');
     const result = await transformText(text, settings);
     console.log('[API Transform] Request successful, returning result');
-    return Response.json(result);
+    return Response.json({ success: true, data: result });
   } catch (error: any) {
     console.error('[API Transform] Error:', error);
     return Response.json({ 
