@@ -44,7 +44,9 @@ export function SettingsSection() {
             onValueChange={(val: any) => setSettings({ goal: val })}
           >
             <SelectTrigger className="w-full bg-neutral-50 border-neutral-200">
-              <SelectValue placeholder="Выберите цель" />
+              <SelectValue>
+                {GOAL_OPTIONS.find(o => o.value === settings.goal)?.label || "Выберите цель"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {GOAL_OPTIONS.map(opt => (
@@ -67,7 +69,9 @@ export function SettingsSection() {
             onValueChange={(val: any) => setSettings({ audience: val })}
           >
             <SelectTrigger className="w-full bg-neutral-50 border-neutral-200">
-              <SelectValue placeholder="Выберите аудиторию" />
+              <SelectValue>
+                {AUDIENCE_OPTIONS.find(o => o.value === settings.audience)?.label || "Выберите аудиторию"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {AUDIENCE_OPTIONS.map(opt => (
@@ -90,7 +94,9 @@ export function SettingsSection() {
             onValueChange={(val: any) => setSettings({ tone: val })}
           >
             <SelectTrigger className="w-full bg-neutral-50 border-neutral-200">
-              <SelectValue placeholder="Выберите тон" />
+              <SelectValue>
+                {TONE_OPTIONS.find(o => o.value === settings.tone)?.label || "Выберите тон"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {TONE_OPTIONS.map(opt => (
