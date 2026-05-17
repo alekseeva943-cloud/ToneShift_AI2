@@ -1,6 +1,7 @@
 import React from 'react';
-import { Sparkles, History, Settings2, Share2 } from 'lucide-react';
+import { Sparkles, History, Settings2, Share2, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
+import { useStore } from '../store/useStore';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -13,12 +14,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <span className="font-bold text-xl tracking-tight">ToneCraft AI</span>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="gap-2 text-neutral-600">
-            <History className="w-4 h-4" />
-            История
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-2 text-neutral-400 hover:text-rose-500 hover:bg-rose-50 transition-all font-bold text-[10px] uppercase tracking-wider h-8"
+            onClick={() => {
+              if (confirm('Очистить всю историю трансформаций?')) {
+                useStore.getState().clearHistory();
+              }
+            }}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            Очистить
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Share2 className="w-4 h-4" />
+          <div className="w-px h-4 bg-neutral-200" />
+          <Button variant="outline" size="sm" className="gap-2 rounded-xl h-9 border-neutral-200 font-bold text-xs">
+            <Share2 className="w-3.5 h-3.5" />
             Поделиться
           </Button>
         </div>

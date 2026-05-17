@@ -18,6 +18,15 @@ export interface AIResponse {
   neutralVersion: string;
   explanation: string;
   suggestions: string[];
+  metrics: {
+    before: Record<string, number>;
+    after: Record<string, number>;
+  };
+  highlights: {
+    text: string;
+    type: 'strengthened' | 'simplified' | 'emotional' | 'business';
+    reason: string;
+  }[];
 }
 
 export interface TransformationResult {

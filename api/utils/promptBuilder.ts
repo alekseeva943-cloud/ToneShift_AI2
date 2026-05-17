@@ -62,7 +62,14 @@ export function buildTransformationPrompt(text: string, settings: Transformation
   "originalText": "Исходный текст (для справки)",
   "neutralVersion": "Максимально сухая, фактологическая версия смысла",
   "explanation": "Почему этот вариант работает лучше для данной аудитории и цели? (акцент на психологии восприятия)",
-  "suggestions": ["3 совета автору по стилю"]
+  "suggestions": ["3 совета автору по стилю"],
+  "metrics": {
+    "before": { "persuasiveness": 0-100, "formality": 0-100, "emotionality": 0-100, "clarity": 0-100, "engagement": 0-100 },
+    "after": { "persuasiveness": 0-100, "formality": 0-100, "emotionality": 0-100, "clarity": 0-100, "engagement": 0-100 }
+  },
+  "highlights": [
+    { "text": "фраза из адаптированного текста", "type": "strengthened|simplified|emotional|business", "reason": "почему это изменение важно" }
+  ]
 }
 
 ВАЖНО: Говори только на русском языке. Сохраняй факты.

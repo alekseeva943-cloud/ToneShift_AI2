@@ -5,7 +5,15 @@ import { ResultCard } from './ResultCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function ResultList() {
-  const { results, isTransforming } = useStore();
+  const { results, isTransforming, thinkingStep } = useStore();
+
+  const thinkingStates = [
+    "Анализируем смысл...",
+    "Определяем аудиторию...",
+    "Перестраиваем структуру...",
+    "Адаптируем тональность...",
+    "Финализируем текст..."
+  ];
 
   return (
     <div className="space-y-8">
@@ -16,31 +24,39 @@ export function ResultList() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="premium-card p-8 bg-white/50 backdrop-blur-md border border-neutral-100 rounded-3xl overflow-hidden"
+            className="premium-card p-8 bg-white/80 backdrop-blur-md border border-neutral-100 rounded-3xl overflow-hidden relative shadow-2xl"
           >
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-20 h-6 bg-neutral-200 animate-pulse rounded-full" />
-              <div className="w-24 h-6 bg-neutral-200 animate-pulse rounded-full" />
+            <div className="flex flex-col items-center justify-center py-12 space-y-6">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-500 rounded-full animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-8 h-8 bg-indigo-500 rounded-lg animate-pulse" />
+                </div>
+              </div>
+              
+              <div className="text-center space-y-2">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={thinkingStep}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="text-lg font-bold text-neutral-800"
+                  >
+                    {thinkingStates[thinkingStep] || "Работаем..."}
+                  </motion.div>
+                </AnimatePresence>
+                <div className="flex gap-1 justify-center">
+                  {thinkingStates.map((_, i) => (
+                    <div 
+                      key={i} 
+                      className={`h-1 rounded-full transition-all duration-500 ${i <= thinkingStep ? 'w-4 bg-indigo-500' : 'w-2 bg-neutral-200'}`} 
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="space-y-4">
-              <div className="w-full h-8 bg-neutral-100 animate-pulse rounded-xl" />
-              <div className="w-[90%] h-8 bg-neutral-100 animate-pulse rounded-xl" />
-              <div className="w-[40%] h-8 bg-neutral-100 animate-pulse rounded-xl" />
-            </div>
-            <div className="mt-12 flex justify-between gap-8 pt-8 border-t border-neutral-100">
-               <div className="flex-1 space-y-3">
-                 <div className="w-24 h-4 bg-neutral-100 animate-pulse rounded-md" />
-                 <div className="w-full h-16 bg-neutral-50/50 animate-pulse rounded-xl" />
-               </div>
-               <div className="flex-1 space-y-3">
-                 <div className="w-24 h-4 bg-neutral-100 animate-pulse rounded-md" />
-                 <div className="flex gap-2">
-                    <div className="w-20 h-8 bg-neutral-50 animate-pulse rounded-lg" />
-                    <div className="w-20 h-8 bg-neutral-50 animate-pulse rounded-lg" />
-                    <div className="w-20 h-8 bg-neutral-50 animate-pulse rounded-lg" />
-                 </div>
-               </div>
-            </div>
+
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
           </motion.div>
         )}

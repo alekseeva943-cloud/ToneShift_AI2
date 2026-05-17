@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { QuickActions } from './QuickActions';
 
 export function EditorSection() {
-  const { inputText, setInputText, settings, setIsTransforming, isTransforming, addResult, addLog } = useStore();
+  const { inputText, setInputText, settings, setIsTransforming, isTransforming, addResult, addLog, setThinkingStep } = useStore();
 
   const handleTransform = async () => {
     if (!inputText.trim()) {
@@ -17,36 +17,39 @@ export function EditorSection() {
       return;
     }
 
+    let interval: any;
     try {
       addLog('[UI] Transformation button clicked');
-      console.log('[EditorSection] Starting transformation');
-      setIsTransforming(true);
+      setIsTransforming(true, 0);
       
+      // Simulated thinking steps
+      let step = 0;
+      interval = setInterval(() => {
+        if (step < 4) {
+          step++;
+          setThinkingStep(step);
+        }
+      }, 1500);
+
       addLog('[UI] Calling aiService.transformText');
       const transformed = await aiService.transformText(inputText, settings);
       
-      addLog('[UI] aiService.transformText returned success');
-      console.log('[EditorSection] Transformation received:', transformed);
-      
-      addLog('[UI] Calling addResult to update state');
-      console.log('[EditorSection] Updating state via addResult');
+      // Ensure at least some steps are shown
+      if (step < 2) await new Promise(r => setTimeout(r, 1000));
+
       addResult({
         original: inputText,
         transformed,
         settings,
         timestamp: Date.now(),
       });
-      addLog('[UI] State update (addResult) completed');
-      console.log('[EditorSection] State update requested');
       
       toast.success('Текст успешно трансформирован');
     } catch (error: any) {
       addLog(`[UI ERROR] Transformation failed: ${error.message}`);
-      console.error('[EditorSection] Transformation failed:', error);
       toast.error(error.message || 'Ошибка при трансформации');
     } finally {
-      addLog('[UI] transformation flow ended');
-      console.log('[EditorSection] Setting isTransforming to false');
+      clearInterval(interval);
       setIsTransforming(false);
     }
   };
@@ -101,15 +104,6 @@ export function EditorSection() {
           )}
         </Button>
       </div>
-
-      {isTransforming && (
-        <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center z-10">
-          <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-lg border border-neutral-100 animate-bounce">
-            <Wand2 className="w-5 h-5 text-indigo-500 animate-pulse" />
-            <span className="font-medium text-neutral-700">ИИ анализирует контекст...</span>
-          </div>
-        </div>
-      )}
     </Card>
   );
 }
