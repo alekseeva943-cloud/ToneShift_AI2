@@ -14,6 +14,7 @@ export interface TransformationSettings {
 
 export interface AIResponse {
   transformedText: string;
+  originalText: string;
   neutralVersion: string;
   explanation: string;
   suggestions: string[];

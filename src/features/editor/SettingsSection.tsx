@@ -116,7 +116,10 @@ export function SettingsSection() {
               value={[settings.formality]} 
               max={100} 
               step={1}
-              onValueChange={([val]) => setSettings({ formality: val })}
+              onValueChange={(val: any) => {
+                const actualVal = Array.isArray(val) ? val[0] : val;
+                setSettings({ formality: actualVal });
+              }}
             />
           </div>
 
@@ -134,7 +137,10 @@ export function SettingsSection() {
               value={[settings.intensity]} 
               max={100} 
               step={1}
-              onValueChange={([val]) => setSettings({ intensity: val })}
+              onValueChange={(val: any) => {
+                const actualVal = Array.isArray(val) ? val[0] : val;
+                setSettings({ intensity: actualVal });
+              }}
             />
           </div>
         </div>

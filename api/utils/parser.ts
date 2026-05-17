@@ -5,6 +5,7 @@ export function parseAIResponse(content: string): AIResponse {
     const parsed = JSON.parse(content);
     return {
       transformedText: parsed.transformedText || parsed.adapted || '',
+      originalText: parsed.originalText || '',
       neutralVersion: parsed.neutralVersion || parsed.neutral || '',
       explanation: parsed.explanation || '',
       suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],

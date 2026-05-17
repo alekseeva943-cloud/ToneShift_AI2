@@ -6,13 +6,13 @@ import { Button } from './ui/button';
 export function DebugPanel() {
   const { logs, clearLogs } = useStore();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && isOpen) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [logs]);
+  }, [logs, isOpen]);
 
   if (!isOpen) {
     return (
@@ -30,13 +30,13 @@ export function DebugPanel() {
       <div className="bg-slate-900 border-b border-slate-800 p-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-          <span className="text-slate-300 font-bold uppercase tracking-wider">DEBUG TRACE CONSOLE</span>
+          <span className="text-slate-300 font-bold uppercase tracking-wider">Консоль отладки</span>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={clearLogs}
             className="p-1.5 hover:bg-slate-800 rounded-md text-slate-500 hover:text-slate-200 transition-colors"
-            title="Clear logs"
+            title="Очистить логи"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -54,7 +54,7 @@ export function DebugPanel() {
         className="flex-1 overflow-auto p-3 space-y-1 bg-black/30"
       >
         {logs.length === 0 ? (
-          <div className="text-slate-600 italic">No logs yet. Try performing an action.</div>
+          <div className="text-slate-600 italic">Логов пока нет. Попробуйте выполнить действие.</div>
         ) : (
           logs.map((log, i) => {
              const isError = log.includes('ERROR') || log.includes('FATAL') || log.includes('Failed');
@@ -76,8 +76,8 @@ export function DebugPanel() {
       </div>
 
       <div className="bg-slate-900/50 p-2 text-[9px] text-slate-500 border-t border-slate-800 flex justify-between">
-        <span>VERCEL_ENV: {window.location.hostname.includes('vercel') ? 'PROD' : 'DEV'}</span>
-        <span>AGENT_INSTRUMENTED: YES</span>
+        <span>СРЕДА_ВЫПОЛНЕНИЯ: {window.location.hostname.includes('vercel') ? 'ПРОДАКШН' : 'РАЗРАБОТКА'}</span>
+        <span>ИНСТРУМЕНТАРИЙ_АГЕНТА: ДА</span>
       </div>
     </div>
   );

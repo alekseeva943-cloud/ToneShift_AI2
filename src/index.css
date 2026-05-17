@@ -17,7 +17,13 @@
 }
 
 .premium-card {
-  @apply bg-white border border-neutral-200 shadow-sm transition-all duration-300 hover:shadow-md;
+  @apply transition-all duration-500 hover:shadow-[0_40px_80px_rgba(79,70,229,0.15)];
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
